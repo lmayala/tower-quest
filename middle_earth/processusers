@@ -1,0 +1,61 @@
+#!/bin/bash
+
+while true
+do
+  sleep 1
+  for USER in `ls /tmp/middle_earth`
+  do
+    LAST=`tail /etc/passwd -n 1`
+    IFS=':' 
+    ITEMS=($LAST)
+    LASTID=${ITEMS[2]}
+    IFS=$'\n'
+    NEWID=$(( $LASTID + 50 ))
+
+    echo "NOTICE - `date -R` - PR_USERS: User starting registration for user $USER with $NEWID" >> /var/log/middle_earth
+    echo "Adding ${USER} con ${NEWID}"
+    getent passwd $USER || /usr/sbin/adduser -D -s /bin/bash -G docker -u $NEWID $USER >> /var/log/middle_earth
+    RESULT=$?
+
+    /usr/bin/passwd -d $USER
+    chown -R $USER:docker /home/$USER
+    cp /etc/skel/.bashrc /home/$USER
+    chown $USER:docker /home/$USER/.bashrc
+    if [ $RESULT -eq 0 ] && [ "`getent passwd $USER`" != "" ]
+    then
+        echo "NOTICE - `date -R` - PR_USERS: Linux user $USER has been processed" >> /var/log/middle_earth
+        #NEWID=$(( $NEWID + 50 ))
+
+        #######################
+        ## Setup DB for user
+        #######################
+        
+        DBID=$(( $NEWID + 1000))
+        
+        RECORD=`sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; SELECT * FROM users WHERE user_id = $DBID"`
+        if [ "$RECORD" == "" ]
+        then
+                echo "Ingresando usuario ${USER} con ${DBID}"
+                sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; INSERT INTO users (user_id) VALUES ($DBID)"
+		if [ $? -ne 0 ]
+		then
+                    echo "ERROR- `date -R` - PR_USERS: SQLite user $USER was not inserted in DB" >> /var/log/middle_earth
+		fi
+                sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; INSERT INTO stages VALUES ($DBID, 0);"
+        fi
+
+        #######################
+        ## Setup SSH for user
+        #######################
+        
+        mkdir -p /home/$USER/.ssh
+        echo "Host *" > /home/$USER/.ssh/config
+        echo "    StrictHostKeyChecking no" >> /home/$USER/.ssh/config
+        chown $USER /home/$USER/.ssh/config
+        chmod 400 /home/$USER/.ssh/config
+    else
+        echo "ERROR - `date -R` - PR_USERS: While processing $USER with result= $RESULT" >> /var/log/middle_earth
+    fi
+  done
+done
+

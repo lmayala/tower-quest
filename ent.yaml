@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  ent:
+    image: alpine:latest
+    command: tail -f /dev/null
+    deploy:
+      resources:
+        limits:
+          memory: 6M
+          cpus: '0.01'
+      replicas: 10
+

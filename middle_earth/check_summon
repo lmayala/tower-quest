@@ -1,0 +1,37 @@
+#!/bin/bash
+
+volumes=$(docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }}{{ "\n" }}{{ end }}{{ end }}' elrond | sort | uniq | tr -d '[:space:]')
+message=$(docker logs elrond)
+
+src=$(docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Source}}{{ "\n" }}{{ end }}{{ end }}' elrond)
+dest=$(docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Destination}}{{ "\n" }}{{ end }}{{ end }}' elrond)
+
+file=$(ls $src)
+timestring=$(cat ${src}/${file})
+now=$(date +%s)
+let diff=($now - $timestring )/60
+
+if [ "$diff" -lt 0 ]; then
+  echo "*********************************************************************************************"
+  echo "**  Either Elrond lives in the future or there's something wrong with the timestamp saved  **"
+  echo "**         Please try taking down and restarting the container with docker-compose         **"
+  echo "**  Remember taking down the container with the flag '-v' to be sure old call is deleted   **"
+  echo "*********************************************************************************************"
+  exit 1
+fi
+
+if [ $diff -gt 10 ]; then
+  echo "*************************************************************************************************************"
+  echo "** The call seems to be a bit too far in the past, so it would be better to retry summoning the community. **"
+  echo "**               Please try taking down and restarting the container with docker-compose                   **"
+  echo "**         Remember taking down the container with the flag '-v' to be sure old call is deleted            **"
+  echo "*************************************************************************************************************"
+  exit 1
+fi
+
+echo "**********************************"
+echo "** Elrond's call was successful **"
+echo "**********************************"
+STAGE=`sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 1 WHERE user_id = $DBID;"`
+read -n 1 -r -s -p "Press any key to continue..." key
+exit 0

@@ -1,0 +1,30 @@
+For this stage, the summon of the council should be represented by Elrond calling all the members and each of the characters responding to the call.
+
+You should create a docker-compose.yaml file with these requirements:
+
+- Elrond container should log only the message "Summons to the community" 
+  It should also create a file in a shared volume with the timestamp for the call.
+  The file created must be the only one in that shared volume
+
+- The members of the communit should log two lines. First one containing one particular message and second one should print the timestamp read from the same file that elrond container created.
+  That means that they should wait for the file to be present before responding to the call.
+
+The particular message for each of them should be:
+
+  Gandalf: I have come with wisdom!
+  Aragorn: Ready for adventure!
+  Legolas: I have arrived at the community!
+  Gimli: Charge!
+  Boromir: For Gondor!
+  Frodo: I have accepted the mission.
+  Sam: Always by your side.
+  Pippin: How exciting to join!
+  Merry: Ready for the journey!
+
+
+=== HOW TO FINISH THE STAGE ===
+
+Once you create the docker-compose.yaml run it in detached mode so each of the containers start running.
+When everything is ready, call the command 'check_summon' that will check that Elrond made the call, and everyone responded to it
+
+Whenever you need to go back to this instructions, command 'helpme' will show this same text.

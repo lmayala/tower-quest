@@ -1,0 +1,7 @@
+#Dockerfile for Rivendel container
+
+FROM alpine
+RUN mkdir /usr/local/bin/middle_earth
+ENV PATH=/usr/local/bin/middle_earth:$PATH
+COPY middle_earth/get_token.sh /usr/local/bin/middle_earth
+CMD ["tail", "-f", "/dev/null"]

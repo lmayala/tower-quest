@@ -1,0 +1,54 @@
+#!/bin/bash
+
+
+declare -A containers=(
+  ["elrond"]="Summons to the community"
+  ["gandalf"]="I have come with wisdom!"
+  ["aragorn"]="Ready for adventure!"
+  ["legolas"]="I have arrived at the community!"
+  ["boromir"]="For Gondor!"
+  ["gimli"]="Charge!"
+  ["frodo"]="I have accepted the mission."
+  ["sam"]="Always by your side."
+  ["merry"]="Ready for the journey!"
+  ["pippin"]="How exciting to join!"
+)
+elrondscall=0
+
+volumes=$(for c in "${!containers[@]}"; do
+  echo $c
+  docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }}{{ "\n" }}{{ end }}{{ end }}' "$c"
+done | sort | uniq | tr -d '[:space:]')
+
+if [ $(echo "$volumes" | wc -l) -ne 1 ]; then
+  echo "Los volúmenes son diferentes."
+fi
+
+
+src=$(docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Source}}{{ "\n" }}{{ end }}{{ end }}' elrond)
+dest=$(docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Destination}}{{ "\n" }}{{ end }}{{ end }}' elrond)
+
+files=$(ls "${src}")
+filecount=$(ls $src|wc -w)
+
+if [ "$filecount" == "1" ]; then
+  elrondscall=$(cat ${src}/${files})
+fi
+
+
+for container in "${!containers[@]}"; do
+  if [ "$container" == "elrond" ]; then
+    continue
+  fi
+
+  log=$(docker logs $container)
+  message=$(echo "$log" | head -n 1)
+  timestamp=$(echo "$log" | sed -n '2p')
+  if [ "$timestamp" -ne "$elrondscall" ]; then
+    echo "$container didn't respond to Elrond's call"
+  fi
+  if [ "${containers[$container]}" != "$message" ]; then
+    echo "${container}'s message is wrong"
+  fi
+done
+

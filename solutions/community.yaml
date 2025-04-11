@@ -1,0 +1,129 @@
+version: "3.8"
+
+services:
+
+  gandalf:
+    image: alpine:latest
+    container_name: gandalf
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'I have come with wisdom!' &&
+             echo $$(cat /tmp/summons.txt) &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+  aragorn:
+    image: alpine:latest
+    container_name: aragorn
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'Ready for adventure!' &&
+             echo $$(cat /tmp/summons.txt) &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+  legolas:
+    image: alpine:latest
+    container_name: legolas
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'I have arrived at the community!' &&
+             echo $$(cat /tmp/summons.txt) &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+  gimli:
+    image: alpine:latest
+    container_name: gimli
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'Charge!' &&
+             echo `cat /tmp/summons.txt` &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+  boromir:
+    image: alpine:latest
+    container_name: boromir
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'For Gondor!' &&
+             echo $$(cat /tmp/summons.txt) &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+  frodo:
+    image: alpine:latest
+    container_name: frodo
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'I have accepted the mission.' &&
+             echo $$(cat /tmp/summons.txt) &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+  sam:
+    image: alpine:latest
+    container_name: sam
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'Always by your side.' &&
+             echo $$(cat /tmp/summons.txt) &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+  pippin:
+    image: alpine:latest
+    container_name: pippin
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'How exciting to join!' &&
+             echo $$(cat /tmp/summons.txt) &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+  merry:
+    image: alpine:latest
+    container_name: merry 
+    command: >
+      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
+             echo 'Ready for the journey!' &&
+             echo $$(cat /tmp/summons.txt) &&
+             sleep 3600"
+    volumes:
+      - summons_volume:/tmp
+    networks:
+      - rivendel_net
+
+volumes:
+  summons_volume:
+    name: summons_volume
+
+networks:
+  rivendel_net:
+    driver: bridge
+
