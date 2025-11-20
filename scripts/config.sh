@@ -4,10 +4,10 @@ if [ ! -f /usr/local/lib/middle_earth/middle_earth.db ]; then
   echo "La base de datos $DATABASE_NAME no existe. Creandola..."
 
   mkdir -p /usr/local/lib/middle_earth
-  chmod 775 /usr/local/lib/middle_earth
+  chmod 777 /usr/local/lib/middle_earth
 
   sqlite3 /usr/local/lib/middle_earth/middle_earth.db < /root/middle_earth.sql
-  chmod 664 /usr/local/lib/middle_earth/middle_earth.db
+  chmod 777 /usr/local/lib/middle_earth/middle_earth.db
 else
   echo "La base de datos $DATABASE_NAME ya existe. No se creará nuevamente."
 fi

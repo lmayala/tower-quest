@@ -39,32 +39,26 @@ case $STAGE in
                 echo ""
 		;;
 	3) 
-		echo "${BOLD}Outside The Prancing Pony ${NORMAL}"
+		echo "${BOLD}The Fellowship's First Steps - Establishing a Secure Network ${NORMAL}"
                 showlines $DATA/help_3.txt
                 echo ""
                 ;;
 
 	4) 
-		echo "${BOLD}From Bree to Rivendel ${NORMAL}"
-		showlines $DATA/help_4.txt FRODOPORT=$FRODOPORT MERRYPORT=$MERRYPORT PIPPINPORT=$PIPPINPORT SAMPORT=$SAMPORT USER=$USER START_BOLD=$START_BOLD END_BOLD=$END_BOLD EVAL=true
+		echo "${BOLD}The Journey Through Moria - Scaling and Load Balancing ${NORMAL}"
+		showlines $DATA/help_4.txt
                 echo ""
                 ;;
 
 	5) 
-		echo "${BOLD}Frodo is hurt${NORMAL}"
-		showlines $DATA/help_5.txt RIVENDEL_PORT=$RIVENDEL_PORT EVAL=true
+		echo "${BOLD}The Wisdom of Galadriel - Environment Variables & Secrets ${NORMAL}"
+		showlines $DATA/help_5.txt
                 echo ""
                 ;;
 	6) 
 		
-		showlines $DATA/sauron_eye.ansi EVAL=false DELAY=0.03
-		keypause
-		clear
-		echo "${BOLD}WELL DONE!! ${NORMAL}"
-		showlines $DATA/help_6.txt 
-		keypause
-		clear
-		showlines $DATA/ring.ansi EVAL=false DELAY=0.03
+		echo "${BOLD}The Defense of Helm's Deep - Orchestrating Allied Forces ${NORMAL}"
+		showlines $DATA/help_6.txt
                 ;;
 	*)
 		clear

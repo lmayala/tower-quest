@@ -1,22 +1,7 @@
-The Council of Elrond
+The Council of Elrond: Elrond's Call
 
-Frodo woke and found himself lying in bed. At first he thought that he had slept late, after a long unpleasant dream that still hovered on the edge of memory. Or perhaps he had been ill? But the ceiling looked strange; it was flat, and it had dark beams richly carved. He lay a little while longer looking at patches of sunlight on the wall, and listening to the sound of a waterfall.
+In the tranquil valley of Rivendell, Frodo awoke, slowly regaining his strength after his arduous journey. He soon learned that a crucial council was to be held, a gathering of the Free Peoples to decide the fate of the One Ring.
 
-‘Where am I, and what is the time?’ he said aloud to the ceiling.
+But before the full council could convene, Elrond, the Lord of Rivendell, needed to send forth a summons. A call to all who would stand against the shadow, a beacon across Middle-earth to gather the wise and the brave. This initial call, though simple, was the foundation upon which the great Fellowship would be built.
 
-‘In the house of Elrond, and it is ten o’clock in the morning,’ said a voice. ‘It is the morning of October the twenty-fourth, if you want to know.’
-
-‘Gandalf!’ cried Frodo, sitting up. There was the old wizard, sitting in a chair by the open window.
-
-‘Yes,’ he said, ‘I am here. And you are lucky to be here, too, after all the absurd things you have done since you left home.’
-
-.....
-
-Frodo was left to himself for a while. He was alone and felt rather forlorn, although all about him the folk of Rivendel were gathered. But those near him were silent, intent upon the music of the voices and the instruments, and they gave no heed to anything else. Frodo began to listen and Sam was talking with Bilbo.
-
-
-‘Well, sir, there is a Council early tomorrow, I hear, and he only got up today for the first time.’
-
-‘Quite right, Sam,’ laughed Bilbo. ‘You can trot off and tell Gandalf that he has gone to bed. Good night, Frodo! Bless me, but it has been good to see you again! There are no folk like hobbits after all for a real good talk. I am getting very old, and I began to wonder if I should live to see your chapters of our story. Good night! I’ll take a walk, I think, and look at the stars of Elbereth in the garden. Sleep well!’
-
----------------------------------------------------------------------------------------------------------------------------
+It is your task to ensure Elrond's summons is properly sent, marking the beginning of this epic tale.

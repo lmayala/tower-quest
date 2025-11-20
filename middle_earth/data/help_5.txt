@@ -1,29 +1,25 @@
-Frodo has been hurt and taken to Rivendel by the rest of the fellowship
+For this stage, the Fellowship arrives in Lothlórien, seeking the wisdom of Lady Galadriel. You will learn to manage sensitive information using environment variables and Docker Compose secrets.
 
-Your mission now is to build the environment for Elrond half-elven to cure him.
+Here are the requirements for your docker-compose.yaml file:
 
-As you may imagine we\'ll need to create another container, but this time the task is not just running an existing image.
-You will need to create a Dockerfile based on nginx image in Docker Hub.
+- Introduce a new service named `galadriel`.
+  - It should use the `alpine` image.
+  - It must be connected to the `fellowship-network`.
+  - It should have an environment variable named `GALADRIEL_MESSAGE` with the value "Even the smallest person can change the course of the future."
+  - It should also use a Docker Compose secret named `galadriel_secret` containing a sensitive phrase, e.g., "The Mirror of Galadriel reveals many things."
+  - Its command should: install `python3`, run a simple Python script to read `GALADRIEL_MESSAGE` from the environment and the content of the secret file, log both, and keep the container running with `tail -f /dev/null`.
 
-Basically, you just need to override index.html file inside the container.
-For that, create an index.html file with the content specified below and copy it over the default index.html inside the nginx image.
+- Introduce a new service named `lothlorien`.
+  - It should use the `alpine` image.
+  - It must be connected to the `fellowship-network`.
+  - It should depend on the `galadriel` service.
+  - Its command should verify that `galadriel_secret` is mounted and readable within its container, and log a confirmation message. It should also keep the container running with `tail -f /dev/null`.
 
+Note: The `galadriel_secret` should be defined globally and then referenced by both `galadriel` and `lothlorien` services. This demonstrates sharing secrets securely.
 
-=== Content required for index.html ===
+=== HOW TO FINISH THE STAGE ===
 
-Healer: Elrond half-elven
-Healed: Frodo Baggins
-Place: Rivendel
+Update your docker-compose.yaml and run it in detached mode (e.g., `docker-compose up -d`).
+When all services are running, the `galadriel` service logs its message and secret, and `lothlorien` confirms secret access, call the command 'check_galadriel_wisdom'.
 
-
-Your content should run at port $RIVENDEL_PORT
-
-=== TIPS ===
-
-Standard folder for nginx index file is /usr/share/nginx/html and there is where you need to copy your own index.html
-Your index.html does not need to have any html code, so it could be only plain text
-
-=== FINISHING THE STAGE ===
-
-For finishing the stage, run the command 'heal_frodo' that will validate the container exists and has the right data.
-You will receive a message with your results
+Whenever you need to go back to these instructions, the command 'helpme' will show this same text.

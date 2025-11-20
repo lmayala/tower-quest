@@ -1,13 +1,53 @@
 #!/bin/bash
 
-volumes=$(docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }}{{ "\n" }}{{ end }}{{ end }}' elrond | sort | uniq | tr -d '[:space:]')
-message=$(docker logs elrond)
+DBID=$(( `id -u` + 1000)) # Assuming DBID is derived from the current user's UID
 
-src=$(docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Source}}{{ "\n" }}{{ end }}{{ end }}' elrond)
-dest=$(docker inspect --format '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Destination}}{{ "\n" }}{{ end }}{{ end }}' elrond)
+# --- Validation for Elrond's container existence and logs ---
+elrond_logs=$(docker-compose logs elrond 2>&1)
+if ! echo "$elrond_logs" | grep -q "Summons to the community"; then
+    echo "****************************************************************************"
+    echo "** Elrond's container did not log 'Summons to the community'. Please check **"
+    echo "** your docker-compose.yaml and Elrond's command.                          **"
+    echo "****************************************************************************"
+    exit 1
+fi
 
-file=$(ls $src)
-timestring=$(cat ${src}/${file})
+# --- Validation for shared volume and timestamp file ---
+# Get the source path of the volume mounted by elrond
+# This needs to be robust for different Docker volume mount points
+# A more reliable way is to exec into the container and check
+elrond_container_id=$(docker-compose ps -q elrond)
+if [ -z "$elrond_container_id" ]; then
+    echo "**************************************************"
+    echo "** Elrond container is not running. Please start **"
+    echo "** your docker-compose setup.                    **"
+    echo "**************************************************"
+    exit 1
+fi
+
+# Check for the timestamp file inside the elrond container's shared volume
+# Assuming the shared volume is mounted at /shared as per the proposed docker-compose.yaml
+timestamp_file_path="/shared/call_timestamp.txt"
+file_count=$(docker exec "$elrond_container_id" find /shared -maxdepth 1 -type f | wc -l)
+if [ "$file_count" -ne 1 ]; then
+    echo "************************************************************************"
+    echo "** There should be exactly one file in Elrond's shared volume (/shared). **"
+    echo "** Please ensure only 'call_timestamp.txt' exists.                      **"
+    echo "************************************************************************"
+    exit 1
+fi
+
+# Try to read the timestamp directly from the container
+timestring=$(docker exec "$elrond_container_id" cat "$timestamp_file_path" 2>/dev/null)
+if [ -z "$timestring" ]; then
+    echo "*****************************************************************************"
+    echo "** Could not read the timestamp from 'call_timestamp.txt' in Elrond's       **"
+    echo "** shared volume. Please ensure the file is created correctly.             **"
+    echo "*****************************************************************************"
+    exit 1
+fi
+
+# Validate the timestamp content
 now=$(date +%s)
 let diff=($now - $timestring )/60
 
@@ -32,6 +72,6 @@ fi
 echo "**********************************"
 echo "** Elrond's call was successful **"
 echo "**********************************"
-STAGE=`sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 1 WHERE user_id = $DBID;"`
+sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 1 WHERE user_id = $DBID;"
 read -n 1 -r -s -p "Press any key to continue..." key
 exit 0

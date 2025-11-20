@@ -1,0 +1,28 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor and IDE files
+*.swp
+*~
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Python specific (less likely given the project's Bash focus, but good practice)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+AGENTS.md
+
+# Old solution examples
+solutions/
+
+# Temporary files
+tmp/
+temp/

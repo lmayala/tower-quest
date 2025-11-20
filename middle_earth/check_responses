@@ -1,0 +1,99 @@
+#!/bin/bash
+
+DBID=$(( `id -u` + 1000))
+
+# --- Check if Stage 1 is completed ---
+CURRENT_STAGE=`sqlite3 /usr/local/lib/middle_earth/middle_earth.db "SELECT stage_completed FROM stages WHERE user_id = $DBID;"`
+if [ "$CURRENT_STAGE" -lt 1 ]; then
+    echo "*************************************************************************"
+    echo "** Stage 1 (Elrond's call) has not been completed yet.                 **"
+    echo "** Please complete Stage 1 before attempting to validate Stage 2.      **"
+    echo "*************************************************************************"
+    exit 1
+fi
+
+# --- Get Elrond's timestamp ---
+elrond_container_id=$(docker ps -q -f name=lotrdc-elrond-1)
+if [ -z "$elrond_container_id" ]; then
+    echo "**************************************************"
+    echo "** Elrond container from Stage 1 is not running. **"
+    echo "** Please ensure you have completed Stage 1 and  **"
+    echo "** Elrond's container (named 'lotrdc-elrond-1') is still up.               **"
+    echo "**************************************************"
+    exit 1
+fi
+
+# Check for docker-compose-stage2.yaml
+if [ ! -f docker-compose-stage2.yaml ]; then
+    echo "*****************************************************************************"
+    echo "** The 'docker-compose-stage2.yaml' file was not found. Please ensure it's **"
+    echo "** in the current directory when running 'check_responses'.                **"
+    echo "*****************************************************************************"
+    exit 1
+fi
+
+timestamp_file_path="/shared/call_timestamp.txt"
+elrond_timestamp=$(docker exec "$elrond_container_id" cat "$timestamp_file_path" 2>/dev/null)
+
+if [ -z "$elrond_timestamp" ]; then
+    echo "*****************************************************************************"
+    echo "** Could not retrieve Elrond's timestamp. Ensure 'call_timestamp.txt' is   **"
+    echo "** correctly created by Elrond in the shared volume.                      **"
+    echo "*****************************************************************************"
+    exit 1
+fi
+
+
+# Define expected messages for each character
+declare -A EXPECTED_MESSAGES
+EXPECTED_MESSAGES["gandalf"]="Gandalf: I have come with wisdom!"
+EXPECTED_MESSAGES["aragorn"]="Aragorn: Ready for adventure!"
+EXPECTED_MESSAGES["legolas"]="Legolas: I have arrived at the community!"
+EXPECTED_MESSAGES["gimli"]="Gimli: Charge!"
+EXPECTED_MESSAGES["boromir"]="Boromir: For Gondor!"
+EXPECTED_MESSAGES["frodo"]="Frodo: I have accepted the mission."
+EXPECTED_MESSAGES["sam"]="Sam: Always by your side."
+EXPECTED_MESSAGES["pippin"]="Pippin: How exciting to join!"
+EXPECTED_MESSAGES["merry"]="Merry: Ready for the journey!"
+
+# Iterate through each character and validate their logs
+ALL_RESPONDED=true
+for character in "${!EXPECTED_MESSAGES[@]}"; do
+    character_logs=$(docker-compose -f docker-compose-stage2.yaml logs "$character" 2>&1)
+    expected_message="${EXPECTED_MESSAGES[$character]}"
+
+    if ! echo "$character_logs" | grep -q "$expected_message"; then
+        echo "*********************************************************************"
+        echo "** $character container did not log: '$expected_message'. Please check **"
+        echo "** your docker-compose.yaml and $character's command.               **"
+        echo "*********************************************************************"
+        ALL_RESPONDED=false
+        continue
+    fi
+
+    if ! echo "$character_logs" | grep -q "Timestamp: $elrond_timestamp"; then
+        echo "*********************************************************************************"
+        echo "** $character container did not log the correct timestamp from Elrond's call.   **"
+        echo "** Expected timestamp: '$elrond_timestamp'. Please check $character's command. **"
+        echo "*********************************************************************************"
+        ALL_RESPONDED=false
+        continue
+    fi
+
+    echo "$character has responded correctly."
+done
+
+if [ "$ALL_RESPONDED" = true ]; then
+    echo "*************************************"
+    echo "** All community members responded **"
+    echo "*************************************"
+    sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 2 WHERE user_id = $DBID;"
+    read -n 1 -r -s -p "Press any key to continue..." key
+    exit 0
+else
+    echo "*********************************************************"
+    echo "** Not all community members responded correctly.      **"
+    echo "** Please review the errors above and try again.       **"
+    echo "*********************************************************"
+    exit 1
+fi

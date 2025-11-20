@@ -1,4 +1,19 @@
-You left The Prancing Pony after talking with Barliman Butterbur and finding Aragorn who will join the fellowship.
+For this stage, the Fellowship needs to establish a secure network for communication, essential for their journey.
 
-If you followed correctly the instructions, you may also have a copy of Gandalf's letter in your home folder.
-For validating this stage and advance to the next one run the command 'validate_letter' 
+Here are the requirements for your docker-compose.yaml file:
+
+- Define a custom bridge network named `fellowship-network`.
+- Connect ALL existing services (Elrond, Gandalf, Aragorn, Legolas, Gimli, Boromir, Frodo, Sam, Pippin, Merry) to this new `fellowship-network`.
+- Introduce a new service named `scout`. The `scout` service should also be connected to `fellowship-network`.
+- Modify the `gandalf` service to run a simple web server (e.g., using `python3 -m http.server 8080` or `nc -l -p 8080 -e echo "Gandalf received your message"`) that listens on port `8080`.
+- The `scout` service should then send a message to `gandalf` via the `fellowship-network` (e.g., `wget -qO- gandalf:8080` or `echo "Scout reporting" | nc gandalf 8080`).
+- The `scout` service should log the response received from `gandalf`.
+
+Note: Ensure all containers, including Elrond and the community members, are part of the `fellowship-network`. This demonstrates secure internal communication.
+
+=== HOW TO FINISH THE STAGE ===
+
+Update your docker-compose.yaml and run it in detached mode (e.g., `docker-compose up -d`).
+When all services are running and the `scout` has successfully communicated with `gandalf`, call the command 'check_fellowship_network'.
+
+Whenever you need to go back to these instructions, the command 'helpme' will show this same text.

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+DBID=$(( `id -u` + 1000))
+
+# --- Check if Stage 4 is completed ---
+CURRENT_STAGE=`sqlite3 /usr/local/lib/middle_earth/middle_earth.db "SELECT stage_completed FROM stages WHERE user_id = $DBID;"`
+if [ "$CURRENT_STAGE" -lt 4 ]; then
+    echo "*************************************************************************"
+    echo "** Stage 4 (The Journey Through Moria) has not been completed yet.     **"
+    echo "** Please complete Stage 4 before attempting to validate Stage 5.      **"
+    echo "*************************************************************************"
+    exit 1
+fi
+
+# Check for docker-compose-stage5.yaml
+if [ ! -f docker-compose-stage5.yaml ]; then
+    echo "*****************************************************************************"
+    echo "** The 'docker-compose-stage5.yaml' file was not found. Please ensure it's **"
+    echo "** in the current directory when running 'check_galadriel_wisdom'.         **"
+    echo "*****************************************************************************"
+    exit 1
+fi
+
+# Check 'galadriel' service logs for environment variable and secret content
+echo "Checking 'galadriel' service..."
+galadriel_logs=$(docker-compose -f docker-compose-stage5.yaml logs galadriel 2>&1)
+
+EXPECTED_MESSAGE="Even the smallest person can change the course of the future."
+EXPECTED_SECRET="The Mirror of Galadriel reveals many things."
+
+if ! echo "$galadriel_logs" | grep -q "GALADRIEL_MESSAGE: $EXPECTED_MESSAGE"; then
+    echo "*********************************************************************************"
+    echo "** 'galadriel' service did not log the expected message from GALADRIEL_MESSAGE. **"
+    echo "** Expected: '$EXPECTED_MESSAGE'. Please check your environment variable setup. **"
+    echo "*********************************************************************************"
+    exit 1
+fi
+
+if ! echo "$galadriel_logs" | grep -q "Secret Content: $EXPECTED_SECRET"; then
+    echo "*********************************************************************************"
+    echo "** 'galadriel' service did not log the expected secret content.                 **"
+    echo "** Expected: '$EXPECTED_SECRET'. Please check your secret setup.                **"
+    echo "*********************************************************************************"
+    exit 1
+fi
+echo "'galadriel' service environment variable and secret content validated."
+
+# Check 'lothlorien' service logs for secret access confirmation
+echo "Checking 'lothlorien' service..."
+lothlorien_logs=$(docker-compose -f docker-compose-stage5.yaml logs lothlorien 2>&1)
+
+if ! echo "$lothlorien_logs" | grep -q "Lothlórien service confirmed access to galadriel_secret"; then
+    echo "*********************************************************************************"
+    echo "** 'lothlorien' service did not confirm access to 'galadriel_secret'.          **"
+    echo "** Please ensure the secret is correctly mounted and read by the service.      **"
+    echo "*********************************************************************************"
+    exit 1
+fi
+echo "'lothlorien' service secret access validated."
+
+echo "******************************************************************"
+echo "** Stage 5 (The Wisdom of Galadriel) completed!                 **"
+echo "******************************************************************"
+sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 5 WHERE user_id = $DBID;"
+read -n 1 -r -s -p "Press any key to continue..." key
+exit 0

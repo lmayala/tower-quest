@@ -1,0 +1,124 @@
+#!/bin/bash
+
+DBID=$(( `id -u` + 1000))
+
+# --- Check if Stage 5 is completed ---
+CURRENT_STAGE=`sqlite3 /usr/local/lib/middle_earth/middle_earth.db "SELECT stage_completed FROM stages WHERE user_id = $DBID;"`
+if [ "$CURRENT_STAGE" -lt 5 ]; then
+    echo "*************************************************************************"
+    echo "** Stage 5 (The Wisdom of Galadriel) has not been completed yet.       **"
+    echo "** Please complete Stage 5 before attempting to validate Stage 6.      **"
+    echo "*************************************************************************"
+    exit 1
+fi
+
+# Check for both docker-compose files
+if [ ! -f docker-compose-defense.yaml ]; then
+    echo "*****************************************************************************"
+    echo "** The 'docker-compose-defense.yaml' file was not found. Please ensure it's **"
+    echo "** in the current directory when running 'check_helms_deep_defense'.         **"
+    echo "*****************************************************************************"
+    exit 1
+fi
+
+if [ ! -f docker-compose-outpost.yaml ]; then
+    echo "*****************************************************************************"
+    echo "** The 'docker-compose-outpost.yaml' file was not found. Please ensure it's **"
+    echo "** in the current directory when running 'check_helms_deep_defense'.         **"
+    echo "*****************************************************************************"
+    exit 1
+fi
+
+# Combine compose files for checking
+COMPOSE_FILES="-f docker-compose-defense.yaml -f docker-compose-outpost.yaml"
+
+# Check 'keep_commander' service healthcheck
+echo "Checking 'keep_commander' healthcheck..."
+
+# Get the container ID for keep_commander from the combined compose files
+keep_commander_id=$(docker-compose $COMPOSE_FILES ps -q keep_commander)
+
+if [ -z "$keep_commander_id" ]; then
+    echo "*************************************************************"
+    echo "** 'keep_commander' service not found or not running.      **"
+    echo "** Ensure it's defined in docker-compose-defense.yaml and  **"
+    echo "** both compose files are up.                              **"
+    echo "*************************************************************"
+    exit 1
+fi
+
+# Check health status
+HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' $keep_commander_id 2>/dev/null)
+if [ "$HEALTH_STATUS" != "healthy" ]; then
+    echo "**************************************************************************************"
+    echo "** 'keep_commander' service is not healthy.                                         **"
+    echo "** Please ensure its healthcheck is correctly configured and the HTTP server is      **"
+    echo "** responsive (e.g., 'python3 -m http.server 8080').                                  **"
+    echo "**************************************************************************************"
+    exit 1
+fi
+echo "'keep_commander' service is healthy."
+
+# Check 'wall_guard' service scaling
+echo "Checking 'wall_guard' service scaling..."
+wall_guard_replicas=$(docker-compose $COMPOSE_FILES ps -q wall_guard | wc -l)
+
+if [ "$wall_guard_replicas" -lt 2 ]; then
+    echo "*****************************************************************************"
+    echo "** The 'wall_guard' service is not scaled to at least 2 replicas.          **"
+    echo "** Please ensure you have configured 'deploy.replicas' for 'wall_guard' in **"
+    echo "** docker-compose-defense.yaml.                                            **"
+    echo "*****************************************************************************"
+    exit 1
+fi
+echo "'wall_guard' service scaled to $wall_guard_replicas replicas."
+
+# Check 'scout_captain'-'keep_commander' communication
+echo "Checking 'scout_captain'-'keep_commander' communication..."
+scout_captain_logs=$(docker-compose $COMPOSE_FILES logs scout_captain 2>&1)
+
+# Look for successful HTTP responses from keep_commander, indicating communication
+if ! echo "$scout_captain_logs" | grep -q "200 OK"; then
+    echo "*******************************************************************************************"
+    echo "** 'scout_captain' did not log successful HTTP 200 OK responses from 'keep_commander'.    **"
+    echo "** Ensure 'keep_commander's server is running and 'scout_captain' is correctly configured **"
+    echo "** to send requests via the 'fellowship-network'.                                        **"
+    echo "*******************************************************************************************"
+    exit 1
+fi
+echo "'scout_captain'-'keep_commander' communication validated."
+
+# Check for expected log messages
+keep_commander_log_msg=$(docker-compose $COMPOSE_FILES logs keep_commander 2>&1 | grep -q "Keep Commander online!")
+if [ $? -ne 0 ]; then
+    echo "*******************************************************************"
+    echo "** 'keep_commander' did not log "Keep Commander online!".          **"
+    echo "*******************************************************************"
+    exit 1
+fi
+
+wall_guard_log_msg=$(docker-compose $COMPOSE_FILES logs wall_guard 2>&1 | grep -q "Wall Guard .* watching the perimeter.")
+if [ $? -ne 0 ]; then
+    echo "*******************************************************************"
+    echo "** 'wall_guard' did not log "Wall Guard .* watching the perimeter.". **"
+    echo "*******************************************************************"
+    exit 1
+fi
+
+scout_captain_log_msg=$(docker-compose $COMPOSE_FILES logs scout_captain 2>&1 | grep -q "Scout Captain reporting to Keep Commander.")
+if [ $? -ne 0 ]; then
+    echo "***********************************************************************"
+    echo "** 'scout_captain' did not log "Scout Captain reporting to Keep Commander.". **"
+    echo "***********************************************************************"
+    exit 1
+fi
+
+echo "All services logged their expected messages."
+
+
+echo "*****************************************************************"
+echo "** Stage 6 (The Defense of Helm's Deep) completed!           **"
+echo "*****************************************************************"
+sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 6 WHERE user_id = $DBID;"
+read -n 1 -r -s -p "Press any key to continue..." key
+exit 0

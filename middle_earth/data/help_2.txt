@@ -1,13 +1,29 @@
-Your mission  will be to find "The Prancing Pony" and start a talk with its owner, Barliman Butterbur.
+Now that Elrond has made his call, it's time for the members of the community to respond!
 
-As you may expect, the inn is represented by a container you should find among the running ones.
-Remember that command 'docker ps' shows all the containers running in docker.
-After you find the container, you can try accessing its filesystem with the following command:
+For this stage, you need to update your docker-compose.yaml to include the following additional services, representing the community members:
 
-docker exec -it <container id or name> /bin/bash 
+- Each member of the community should be its own service.
+- Each member's container should log two lines: first, a particular message, and second, the timestamp read from the 'call_timestamp.txt' file created by Elrond's container.
+- This means each member container should wait for the 'call_timestamp.txt' file to be present in the shared volume before logging its response.
+- You will need to ensure these new services share the same volume as Elrond to access the timestamp file, and depend on Elrond's service to ensure the file is created.
 
-When inside the container, you will have to find Barliman Butterbur who will tell the next step for your mission.
+Note: When you run `docker-compose up -d` for stage 2, your services will be named `lotrdc-[service_name]-1` (e.g., `lotrdc-gandalf-1`). The `check_responses` command relies on this naming convention.
 
-If needed, the command 'helpme' will also be available inside "The Prancing Pony"
+The particular message for each member should be:
 
+  Gandalf: I have come with wisdom!
+  Aragorn: Ready for adventure!
+  Legolas: I have arrived at the community!
+  Gimli: Charge!
+  Boromir: For Gondor!
+  Frodo: I have accepted the mission.
+  Sam: Always by your side.
+  Pippin: How exciting to join!
+  Merry: Ready for the journey!
 
+=== HOW TO FINISH THE STAGE ===
+
+Update your docker-compose.yaml and run it in detached mode (e.g., `docker-compose up -d`).
+When all containers have started and logged their messages, call the command 'check_responses' that will check that everyone responded to the call.
+
+Whenever you need to go back to these instructions, the command 'helpme' will show this same text.

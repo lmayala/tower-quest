@@ -1,3 +1,27 @@
-You finished your adventure, but this could not be the end.
+For this final stage, the Fellowship prepares for The Defense of Helm's Deep. You will learn to orchestrate complex deployments using multiple Docker Compose files and advanced features to coordinate allied forces.
 
-Be prepared for your next journey
+Here are the requirements for your Docker Compose setup:
+
+- Create two separate Docker Compose files: `docker-compose-defense.yaml` and `docker-compose-outpost.yaml`.
+  - Both must share the existing `fellowship-network` as an external network.
+
+- In `docker-compose-defense.yaml`:
+  - Define a service `keep_commander` (image: `alpine`). It should implement a simple HTTP server on port `8080` (e.g., `python3 -m http.server 8080`). Its log should include "Keep Commander online!".
+  - Define a service `wall_guard` (image: `alpine`). This service should scale to at least 2 replicas. Each instance should log "Wall Guard $HOSTNAME watching the perimeter.".
+  - Implement a `healthcheck` for `keep_commander` that checks if its HTTP server is responsive.
+
+- In `docker-compose-outpost.yaml`:
+  - Define a service `scout_captain` (image: `alpine`). It should be connected to the `fellowship-network`.
+  - `scout_captain` should depend on `keep_commander`.
+  - Its command should install `curl`, then continuously (`while true`) attempt to reach `http://keep_commander:8080` every 5 seconds, logging the response. It should also log "Scout Captain reporting to Keep Commander.".
+
+- All services should use `tail -f /dev/null` to stay alive.
+
+Note: You will need to bring up both compose files together to orchestrate the full defense (e.g., `docker-compose -f docker-compose-defense.yaml -f docker-compose-outpost.yaml up -d`).
+
+=== HOW TO FINISH THE STAGE ===
+
+Create both `docker-compose-defense.yaml` and `docker-compose-outpost.yaml`, and run them together in detached mode.
+When all services are running, `keep_commander` is healthy, `wall_guard` is scaled, and `scout_captain` is successfully communicating with `keep_commander`, call the command 'check_helms_deep_defense'.
+
+Whenever you need to go back to these instructions, the command 'helpme' will show this same text.
