@@ -12,14 +12,6 @@ if [ "$CURRENT_STAGE" -lt 2 ]; then
     exit 1
 fi
 
-# Check for docker-compose-stage3.yaml
-if [ ! -f docker-compose-stage3.yaml ]; then
-    echo "*****************************************************************************"
-    echo "** The 'docker-compose-stage3.yaml' file was not found. Please ensure it's **"
-    echo "** in the current directory when running 'check_stage3'.                   **"
-    echo "*****************************************************************************"
-    exit 1
-fi
 
 # Check for custom network 'fellowship-network'
 if ! docker network inspect fellowship-network &>/dev/null; then
@@ -45,7 +37,7 @@ declare -a SERVICES=("elrond" "gandalf" "aragorn" "legolas" "gimli" "boromir" "f
 # Validate each service is connected to fellowship-network
 ALL_CONNECTED=true
 for service in "${SERVICES[@]}"; do
-    container_name="lotrdc-${service}-1"
+    container_name="${service}"
     container_id=$(docker ps -q -f name="$container_name")
 
     if [ -z "$container_id" ]; then
@@ -78,7 +70,7 @@ fi
 
 # Check Gandalf-Scout communication
 echo "Checking Gandalf-Scout communication..."
-scout_logs=$(docker-compose -f docker-compose-stage3.yaml logs scout 2>&1)
+scout_logs=$(docker logs scout 2>&1)
 
 # Expected message from Gandalf, adjust based on Gandalf's command
 # For `nc -l -p 8080 -e echo "Gandalf received your message"`
@@ -102,4 +94,5 @@ echo "** Stage 3 (The Fellowship's First Steps) completed! **"
 echo "******************************************************"
 sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 3 WHERE user_id = $DBID;"
 read -n 1 -r -s -p "Press any key to continue..." key
+welcome
 exit 0

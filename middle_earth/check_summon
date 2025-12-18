@@ -3,7 +3,7 @@
 DBID=$(( `id -u` + 1000)) # Assuming DBID is derived from the current user's UID
 
 # --- Validation for Elrond's container existence and logs ---
-elrond_logs=$(docker-compose logs elrond 2>&1)
+elrond_logs=$(docker logs elrond 2>&1)
 if ! echo "$elrond_logs" | grep -q "Summons to the community"; then
     echo "****************************************************************************"
     echo "** Elrond's container did not log 'Summons to the community'. Please check **"
@@ -16,7 +16,7 @@ fi
 # Get the source path of the volume mounted by elrond
 # This needs to be robust for different Docker volume mount points
 # A more reliable way is to exec into the container and check
-elrond_container_id=$(docker-compose ps -q elrond)
+elrond_container_id=$(docker ps -q -f name=elrond)
 if [ -z "$elrond_container_id" ]; then
     echo "**************************************************"
     echo "** Elrond container is not running. Please start **"
@@ -74,4 +74,5 @@ echo "** Elrond's call was successful **"
 echo "**********************************"
 sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 1 WHERE user_id = $DBID;"
 read -n 1 -r -s -p "Press any key to continue..." key
+welcome
 exit 0

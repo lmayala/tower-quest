@@ -4,9 +4,10 @@ You should create a docker-compose.yaml file with the following requirements for
 
 - Elrond's container should log the message "Summons to the community".
 - It should also create a file named 'call_timestamp.txt' in a shared volume, containing the current timestamp.
+- Tip: Shared volumes are typically defined using the `volumes` tag in `docker-compose.yaml` to enable data sharing or persistence.
 - This 'call_timestamp.txt' file must be the only file created by Elrond in that shared volume.
 
-Note: When you run `docker-compose up -d` from the root directory (`/root/lotrdc`), your Docker Compose project will typically be named `lotrdc`. This means your Elrond container will be automatically named `lotrdc-elrond-1`. The `check_summon` command relies on this naming convention.
+Note: For this stage, the container running your Elrond service must be explicitly named 'elrond' using the `container_name` field in your `docker-compose.yaml`. The `check_summon` command relies on this specific container name.
 
 === HOW TO FINISH THE STAGE ===
 

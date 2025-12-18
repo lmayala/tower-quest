@@ -63,4 +63,5 @@ echo "** Stage 5 (The Wisdom of Galadriel) completed!                 **"
 echo "******************************************************************"
 sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 5 WHERE user_id = $DBID;"
 read -n 1 -r -s -p "Press any key to continue..." key
+welcome
 exit 0

@@ -6,7 +6,52 @@ Here are the requirements for your docker-compose.yaml file:
 - Connect ALL existing services (Elrond, Gandalf, Aragorn, Legolas, Gimli, Boromir, Frodo, Sam, Pippin, Merry) to this new `fellowship-network`.
 - Introduce a new service named `scout`. The `scout` service should also be connected to `fellowship-network`.
 - Modify the `gandalf` service to run a simple web server (e.g., using `python3 -m http.server 8080` or `nc -l -p 8080 -e echo "Gandalf received your message"`) that listens on port `8080`.
-- The `scout` service should then send a message to `gandalf` via the `fellowship-network` (e.g., `wget -qO- gandalf:8080` or `echo "Scout reporting" | nc gandalf 8080`).
+- The `scout` service should then send a message to `gandalf` via the `fellowship-network`. Here are a few alternatives for sending the message:
+  - Using `curl`:
+    ```bash
+    echo "Scout reporting" | curl -X POST -d @- http://gandalf:8080
+    ```
+  - Using `wget`:
+    ```bash
+    echo "Scout reporting" | wget --post-data='-' -qO- http://gandalf:8080
+    ```
+  - Using `netcat (nc)`:
+    ```bash
+    echo "Scout reporting" | nc gandalf 8080
+    ```
+- The `scout` service will log its message to `/shared/scout_call.txt` and `gandalf`'s response to `/shared/gandalf_response.txt`.
+
+Note: Ensure all containers, including Elrond and the community members, are part of the `fellowship-network`. This demonstrates secure internal communication.
+
+=== HOW TO FINISH THE STAGE ===
+
+Update your docker-compose.yaml and run it in detached mode (e.g., `docker-compose up -d`).
+When all services are running and the `scout` has successfully communicated with `gandalf`, call the command 'check_fellowship_network'.
+
+Whenever you need to go back to these instructions, the command 'helpme' will show this same text.
+- The `scout` service should then send a message to `gandalf` via the `fellowship-network`. Here are a few alternatives for sending the message:
+  - Using `curl`:  
+    ```bash
+    echo "Scout reporting" | curl -X POST -d @- http://gandalf:8080
+    ```
+  - Using `wget`:  
+    ```bash
+    echo "Scout reporting" | wget --post-data='-' -qO- http://gandalf:8080
+    ```
+  - Using `netcat (nc)`:  
+    ```bash
+    echo "Scout reporting" | nc gandalf 8080
+    ```
+- The `scout` service should log the response received from `gandalf` in the shared volume.
+
+Note: Ensure all containers, including Elrond and the community members, are part of the `fellowship-network`. This demonstrates secure internal communication.
+
+=== HOW TO FINISH THE STAGE ===
+
+Update your docker-compose.yaml and run it in detached mode (e.g., `docker-compose up -d`).
+When all services are running and the `scout` has successfully communicated with `gandalf`, call the command 'check_fellowship_network'.
+
+Whenever you need to go back to these instructions, the command 'helpme' will show this same text.
 - The `scout` service should log the response received from `gandalf`.
 
 Note: Ensure all containers, including Elrond and the community members, are part of the `fellowship-network`. This demonstrates secure internal communication.

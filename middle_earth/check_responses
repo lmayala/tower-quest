@@ -13,24 +13,17 @@ if [ "$CURRENT_STAGE" -lt 1 ]; then
 fi
 
 # --- Get Elrond's timestamp ---
-elrond_container_id=$(docker ps -q -f name=lotrdc-elrond-1)
+elrond_container_id=$(docker ps -q -f name=fellowship)
 if [ -z "$elrond_container_id" ]; then
     echo "**************************************************"
     echo "** Elrond container from Stage 1 is not running. **"
     echo "** Please ensure you have completed Stage 1 and  **"
-    echo "** Elrond's container (named 'lotrdc-elrond-1') is still up.               **"
+    echo "** Elrond's container (named 'fellowship') is still up.               **"
     echo "**************************************************"
     exit 1
 fi
 
-# Check for docker-compose-stage2.yaml
-if [ ! -f docker-compose-stage2.yaml ]; then
-    echo "*****************************************************************************"
-    echo "** The 'docker-compose-stage2.yaml' file was not found. Please ensure it's **"
-    echo "** in the current directory when running 'check_responses'.                **"
-    echo "*****************************************************************************"
-    exit 1
-fi
+
 
 timestamp_file_path="/shared/call_timestamp.txt"
 elrond_timestamp=$(docker exec "$elrond_container_id" cat "$timestamp_file_path" 2>/dev/null)
@@ -59,7 +52,16 @@ EXPECTED_MESSAGES["merry"]="Merry: Ready for the journey!"
 # Iterate through each character and validate their logs
 ALL_RESPONDED=true
 for character in "${!EXPECTED_MESSAGES[@]}"; do
-    character_logs=$(docker-compose -f docker-compose-stage2.yaml logs "$character" 2>&1)
+    character_container_id=$(docker ps -q -f name="$character")
+    if [ -z "$character_container_id" ]; then
+        echo "*********************************************************************"
+        echo "** The container named '$character' is not running. Please ensure    **"
+        echo "** all your Stage 2 containers are running correctly.              **"
+        echo "*********************************************************************"
+        ALL_RESPONDED=false
+        continue
+    fi
+    character_logs=$(docker logs "$character" 2>&1)
     expected_message="${EXPECTED_MESSAGES[$character]}"
 
     if ! echo "$character_logs" | grep -q "$expected_message"; then
@@ -71,10 +73,10 @@ for character in "${!EXPECTED_MESSAGES[@]}"; do
         continue
     fi
 
-    if ! echo "$character_logs" | grep -q "Timestamp: $elrond_timestamp"; then
+    if ! echo "$character_logs" | grep -q "$elrond_timestamp"; then
         echo "*********************************************************************************"
         echo "** $character container did not log the correct timestamp from Elrond's call.   **"
-        echo "** Expected timestamp: '$elrond_timestamp'. Please check $character's command. **"
+        echo "** Expected timestamp: '$elrond_timestamp'. Please check $character's command for correct format. **"
         echo "*********************************************************************************"
         ALL_RESPONDED=false
         continue
@@ -89,6 +91,7 @@ if [ "$ALL_RESPONDED" = true ]; then
     echo "*************************************"
     sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 2 WHERE user_id = $DBID;"
     read -n 1 -r -s -p "Press any key to continue..." key
+    welcome
     exit 0
 else
     echo "*********************************************************"

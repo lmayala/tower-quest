@@ -1,13 +1,15 @@
 Now that Elrond has made his call, it's time for the members of the community to respond!
 
-For this stage, you need to update your docker-compose.yaml to include the following additional services, representing the community members:
+Now that Elrond has made his call, it's time for the members of the community to respond!
+
+For this stage, you will update your Docker Compose file. This file must include your Elrond service and introduce new services for the community members. Each new community member service must also be explicitly named using 'container_name' with its lowercase character name (e.g., 'gandalf' for Gandalf). All Stage 2 services must be defined within a single Docker Compose project to function correctly:
 
 - Each member of the community should be its own service.
 - Each member's container should log two lines: first, a particular message, and second, the timestamp read from the 'call_timestamp.txt' file created by Elrond's container.
 - This means each member container should wait for the 'call_timestamp.txt' file to be present in the shared volume before logging its response.
-- You will need to ensure these new services share the same volume as Elrond to access the timestamp file, and depend on Elrond's service to ensure the file is created.
+- These new services must share the same volume as Elrond to access the timestamp file, and explicitly depend on Elrond's service to ensure the file is created.
 
-Note: When you run `docker-compose up -d` for stage 2, your services will be named `lotrdc-[service_name]-1` (e.g., `lotrdc-gandalf-1`). The `check_responses` command relies on this naming convention.
+Note: All community member containers must be explicitly named with their lowercase character name (e.g., 'gandalf', 'aragorn', 'legolas', etc.) using the 'container_name' directive. The 'check_responses' command will identify all services by these explicit container names.
 
 The particular message for each member should be:
 
@@ -23,7 +25,35 @@ The particular message for each member should be:
 
 === HOW TO FINISH THE STAGE ===
 
-Update your docker-compose.yaml and run it in detached mode (e.g., `docker-compose up -d`).
+First, ensure any containers from Stage 1 are stopped and removed to avoid conflicts (e.g., `docker-compose down -v`).
+Then, run your Docker Compose file in detached mode (e.g., `docker-compose up -d`).
+When all containers have started and logged their messages, call the command 'check_responses' that will check that everyone responded to the call.
+
+Whenever you need to go back to these instructions, the command 'helpme' will show this same text. Each new community member service must also be explicitly named using 'container_name' with its lowercase character name (e.g., 'gandalf' for Gandalf). All Stage 2 services must be defined within a single Docker Compose project to function correctly:
+
+- Each member of the community should be its own service.
+- Each member's container should log two lines: first, a particular message, and second, the timestamp read from the 'call_timestamp.txt' file created by Elrond's container.
+- This means each member container should wait for the 'call_timestamp.txt' file to be present in the shared volume before logging its response.
+- These new services must share the same volume as Elrond to access the timestamp file, and explicitly depend on Elrond's service to ensure the file is created.
+
+Note: Your Elrond container must be named 'elrond'. All other community member containers must be explicitly named with their lowercase character name (e.g., 'gandalf', 'aragorn', 'legolas', etc.) using the 'container_name' directive. The 'check_responses' command will identify all services by these explicit container names.
+
+The particular message for each member should be:
+
+  Gandalf: I have come with wisdom!
+  Aragorn: Ready for adventure!
+  Legolas: I have arrived at the community!
+  Gimli: Charge!
+  Boromir: For Gondor!
+  Frodo: I have accepted the mission.
+  Sam: Always by your side.
+  Pippin: How exciting to join!
+  Merry: Ready for the journey!
+
+=== HOW TO FINISH THE STAGE ===
+
+First, ensure any containers from Stage 1 (especially 'elrond') are stopped and removed to avoid conflicts (e.g., `docker-compose down -v` or `docker rm -f elrond` if run directly).
+Then, run your Docker Compose file in detached mode (e.g., `docker-compose up -d` or `docker-compose -f your-compose-file.yaml up -d`).
 When all containers have started and logged their messages, call the command 'check_responses' that will check that everyone responded to the call.
 
 Whenever you need to go back to these instructions, the command 'helpme' will show this same text.
