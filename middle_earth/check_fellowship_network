@@ -69,14 +69,20 @@ if [ "$ALL_CONNECTED" = false ]; then
 fi
 
 # Check Gandalf-Scout communication
+
 echo "Checking Gandalf-Scout communication..."
 scout_logs=$(docker logs scout 2>&1)
-
-# Expected message from Gandalf, adjust based on Gandalf's command
-# For `nc -l -p 8080 -e echo "Gandalf received your message"`
 EXPECTED_GANDALF_RESPONSE="Gandalf received your message" 
-# For `python3 -m http.server 8080`, scout would likely log the HTML output, which might be empty or contain directory listing HTML. 
-# We'll assume the nc example for now, as it's simpler for validation.
+GANDALF_IP=$(docker inspect gandalf|grep IPAddress|awk '{print $2}'|tr -d '",')
+GANDALF_RESPONSE=$(wget -qO- http://${GANDALF_IP}:8080/)
+
+if [ "$EXPECTED_GANDALF_RESPONSE" != "$GANDALF_RESPONSE" ]; then
+    echo "*****************************************************************************************"
+    echo "** Gandalf container is not responding properly or answer is not the expected one      **"
+    echo "** Please ensure Gandalf's server is running correctly                                 **"
+    echo "*****************************************************************************************"
+    exit 1
+fi
 
 if ! echo "$scout_logs" | grep -q "$EXPECTED_GANDALF_RESPONSE"; then
     echo "*****************************************************************************************"
