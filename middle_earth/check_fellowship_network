@@ -75,8 +75,9 @@ scout_logs=$(docker logs scout 2>&1)
 EXPECTED_GANDALF_RESPONSE="Gandalf received your message" 
 GANDALF_IP=$(docker inspect gandalf|grep IPAddress|awk '{print $2}'|tr -d '",')
 GANDALF_RESPONSE=$(wget -qO- http://${GANDALF_IP}:8080/)
+echo $scout_logs
 
-if [ "$EXPECTED_GANDALF_RESPONSE" != "$GANDALF_RESPONSE" ]; then
+if [[ "$EXPECTED_GANDALF_RESPONSE" != "$GANDALF_RESPONSE" ]]; then
     echo "*****************************************************************************************"
     echo "** Gandalf container is not responding properly or answer is not the expected one      **"
     echo "** Please ensure Gandalf's server is running correctly                                 **"

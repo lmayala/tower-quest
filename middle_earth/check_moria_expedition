@@ -62,12 +62,17 @@ explorer_logs=$(docker-compose -f docker-compose-stage4.yaml logs explorer 2>&1)
 # The python http.server returns a 200 OK. The output to curl -s would be the HTML content, which is usually blank or a directory listing.
 # We can just look for the absence of connection errors and repeated curl attempts.
 
-if ! echo "$explorer_logs" | grep -q "HTTP/1.0 200 OK"; then
+# Get valid torchbearer names and short IDs
+valid_identifiers=$(docker-compose -f docker-compose-stage4.yaml ps torchbearer --format "{{.Name}} {{.ID}}" | tr ' ' '\n' | sort -u)
+
+# Extract identifiers from explorer logs and verify they are valid torchbearers
+instances=$(echo "$explorer_logs" | sed -n 's/.*Torchbearer instance \+\([^ ]\+\).*/\1/p' | sort -u | grep -Fxf <(echo "$valid_identifiers") | wc -l)
+
+if [ "$instances" -ne 3 ]; then
     echo "**************************************************************************************"
-    echo "** Explorer did not log successful HTTP 200 OK responses from 'torchbearer'.        **"
-    echo "** Ensure 'torchbearer' instances are running their web server and 'explorer'       **"
-    echo "** is correctly configured to send requests.                                        **"
+    echo "** Explorer didn't log correctly the logs for torchbearer instances                 **"
     echo "**************************************************************************************"
+    echo "$instances instances found"
     exit 1
 fi
 

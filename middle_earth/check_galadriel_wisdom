@@ -28,7 +28,7 @@ galadriel_logs=$(docker-compose -f docker-compose-stage5.yaml logs galadriel 2>&
 EXPECTED_MESSAGE="Even the smallest person can change the course of the future."
 EXPECTED_SECRET="The Mirror of Galadriel reveals many things."
 
-if ! echo "$galadriel_logs" | grep -q "GALADRIEL_MESSAGE: $EXPECTED_MESSAGE"; then
+if ! echo "$galadriel_logs" | grep -qE "GALADRIEL_MESSAGE: *$EXPECTED_MESSAGE"; then
     echo "*********************************************************************************"
     echo "** 'galadriel' service did not log the expected message from GALADRIEL_MESSAGE. **"
     echo "** Expected: '$EXPECTED_MESSAGE'. Please check your environment variable setup. **"
@@ -36,7 +36,7 @@ if ! echo "$galadriel_logs" | grep -q "GALADRIEL_MESSAGE: $EXPECTED_MESSAGE"; th
     exit 1
 fi
 
-if ! echo "$galadriel_logs" | grep -q "Secret Content: $EXPECTED_SECRET"; then
+if ! echo "$galadriel_logs" | grep -qE "Secret Content: *$EXPECTED_SECRET"; then
     echo "*********************************************************************************"
     echo "** 'galadriel' service did not log the expected secret content.                 **"
     echo "** Expected: '$EXPECTED_SECRET'. Please check your secret setup.                **"
@@ -49,7 +49,7 @@ echo "'galadriel' service environment variable and secret content validated."
 echo "Checking 'lothlorien' service..."
 lothlorien_logs=$(docker-compose -f docker-compose-stage5.yaml logs lothlorien 2>&1)
 
-if ! echo "$lothlorien_logs" | grep -q "Lothlórien service confirmed access to galadriel_secret"; then
+if ! echo "$lothlorien_logs" | grep -qE "Lothlórien service confirmed access to *galadriel_secret"; then
     echo "*********************************************************************************"
     echo "** 'lothlorien' service did not confirm access to 'galadriel_secret'.          **"
     echo "** Please ensure the secret is correctly mounted and read by the service.      **"
