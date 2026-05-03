@@ -5,7 +5,7 @@ Here are the requirements for your docker-compose.yaml file:
 - Define a new service named `torchbearer`.
   - It should use the `alpine` image.
   - It must be connected to the `fellowship-network` (from Stage 3).
-  - Its command should install `python3`, run `python3 -m http.server 8080`, and then log `Torchbearer instance $HOSTNAME is shining a light!` and keep the container running.
+  - It should run a simple HTTP server on port `8080`, log `Torchbearer instance $HOSTNAME is shining a light!`, and keep the container running.
   - Scale the `torchbearer` service to at least 3 replicas using the `deploy` configuration.
 
 - Introduce a new service named `explorer`.

@@ -1,24 +1,18 @@
-version: "3.8"
-
 services:
 
   elrond:
-    image: rivendel:latest
+    image: alpine
     container_name: elrond
     command: >
       sh -c 'echo "Summons to the community" &&
-             echo $$(date +%s) > /tmp/summons.txt &&
+             echo $$(date +%s) > /shared/call_timestamp.txt &&
              tail -f /dev/null'
     volumes:
-      - summons_volume:/tmp
+      - summons_volume:/shared
     networks:
       - rivendel_net
 
 volumes:
   summons_volume:
     name: summons_volume
-
-networks:
-  rivendel_net:
-    driver: bridge
 

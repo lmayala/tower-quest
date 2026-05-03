@@ -6,7 +6,7 @@ Here are the requirements for your Docker Compose setup:
   - Both must share the existing `fellowship-network` as an external network.
 
 - In `docker-compose-defense.yaml`:
-  - Define a service `keep_commander` (image: `alpine`). It should implement a simple HTTP server on port `8080` (e.g., `python3 -m http.server 8080`). Its log should include "Keep Commander online!".
+  - Define a service `keep_commander` (image: `alpine`). It should implement a simple HTTP server on port `8080`. Its log should include "Keep Commander online!".
   - Define a service `wall_guard` (image: `alpine`). This service should scale to at least 2 replicas. Each instance should log "Wall Guard $HOSTNAME watching the perimeter.".
   - Implement a `healthcheck` for `keep_commander` that checks if its HTTP server is responsive.
 

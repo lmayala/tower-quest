@@ -7,7 +7,7 @@ Here are the requirements for your docker-compose.yaml file:
   - It must be connected to the `fellowship-network`.
   - It should have an environment variable named `GALADRIEL_MESSAGE` with the value "Even the smallest person can change the course of the future."
   - It should also use a Docker Compose secret named `galadriel_secret` containing a sensitive phrase, e.g., "The Mirror of Galadriel reveals many things."
-  - Its command should: install `python3`, run a simple Python script to read `GALADRIEL_MESSAGE` from the environment and the content of the secret file, log both, and keep the container running with `tail -f /dev/null`.
+  - Its command should read `GALADRIEL_MESSAGE` from the environment and the content of the secret file, log both, and keep the container running with `tail -f /dev/null`.
 
 - Introduce a new service named `lothlorien`.
   - It should use the `alpine` image.

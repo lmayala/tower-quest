@@ -22,7 +22,7 @@ fi
 clear
 if [ "$STAGE" == "1" ] 
 then
-   showlines $DATA/gandalf.ansi DELAY=0.04
+   showlines $DATA/rivendell.ansi DELAY=0.04
    sleep 2
    toilet -ktf small --gay < $DATA/quote1.txt
    keypause
@@ -31,6 +31,30 @@ fi
 if [ -e $DATA/story_${STAGE}.txt ]
 then
     showlines $DATA/story_${STAGE}.txt
+    keypause
+fi
+if [ "$STAGE" == "6" ]
+then
+    showlines $DATA/story_6a.txt
+    keypause
+    if [ -e $DATA/amon-hen.ansi ]
+    then
+        showlines $DATA/amon-hen.ansi
+        keypause
+    fi
+    showlines $DATA/story_6b.txt
+    keypause
+fi
+if [ "$STAGE" == "5" ]
+then
+    showlines $DATA/story_5a.txt
+    keypause
+    if [ -e $DATA/youshallnotpass.ansi ]
+    then
+        showlines $DATA/youshallnotpass.ansi
+        keypause
+    fi
+    showlines $DATA/story_5b.txt
     keypause
 fi
 helpme

@@ -12,18 +12,9 @@ if [ "$CURRENT_STAGE" -lt 3 ]; then
     exit 1
 fi
 
-# Check for docker-compose-stage4.yaml
-if [ ! -f docker-compose-stage4.yaml ]; then
-    echo "*****************************************************************************"
-    echo "** The 'docker-compose-stage4.yaml' file was not found. Please ensure it's **"
-    echo "** in the current directory when running 'check_moria_expedition'.         **"
-    echo "*****************************************************************************"
-    exit 1
-fi
-
-# Verify 'torchbearer' service is scaled to at least 3 replicas
+# Check for running torchbearer service replicas
 echo "Checking 'torchbearer' service scaling..."
-torchbearer_replicas=$(docker-compose -f docker-compose-stage4.yaml ps -q torchbearer | wc -l)
+torchbearer_replicas=$(docker ps --filter "label=com.docker.compose.service=torchbearer" -q | wc -l)
 
 if [ "$torchbearer_replicas" -lt 3 ]; then
     echo "*********************************************************************************"
@@ -37,12 +28,12 @@ echo "'torchbearer' service scaled to $torchbearer_replicas replicas."
 
 # Check if 'explorer' service is running
 echo "Checking 'explorer' service..."
-explorer_container_id=$(docker-compose -f docker-compose-stage4.yaml ps -q explorer)
+explorer_container_id=$(docker ps --filter "label=com.docker.compose.service=explorer" -q | head -n 1)
 if [ -z "$explorer_container_id" ]; then
     echo "*****************************************************************"
     echo "** The 'explorer' service container is not running.            **"
     echo "** Please ensure you have defined and started the 'explorer'   **"
-    echo "** service in your docker-compose-stage4.yaml.                 **"
+    echo "** service.                                                    **"
     echo "*****************************************************************"
     exit 1
 fi
@@ -50,7 +41,7 @@ echo "'explorer' service is running."
 
 # Check for explorer-torchbearer communication (by checking explorer logs)
 echo "Checking explorer-torchbearer communication..."
-explorer_logs=$(docker-compose -f docker-compose-stage4.yaml logs explorer 2>&1)
+explorer_logs=$(docker logs "$explorer_container_id" 2>&1)
 
 # The explorer should be curling to http://torchbearer:8080, which should return the server's response.
 # The response from the python http.server is usually blank or a simple directory listing, which won't appear directly
@@ -63,7 +54,7 @@ explorer_logs=$(docker-compose -f docker-compose-stage4.yaml logs explorer 2>&1)
 # We can just look for the absence of connection errors and repeated curl attempts.
 
 # Get valid torchbearer names and short IDs
-valid_identifiers=$(docker-compose -f docker-compose-stage4.yaml ps torchbearer --format "{{.Name}} {{.ID}}" | tr ' ' '\n' | sort -u)
+valid_identifiers=$(docker ps --filter "label=com.docker.compose.service=torchbearer" --format "{{.Names}} {{.ID}}" | tr ' ' '\n' | sort -u)
 
 # Extract identifiers from explorer logs and verify they are valid torchbearers
 instances=$(echo "$explorer_logs" | sed -n 's/.*Torchbearer instance \+\([^ ]\+\).*/\1/p' | sort -u | grep -Fxf <(echo "$valid_identifiers") | wc -l)

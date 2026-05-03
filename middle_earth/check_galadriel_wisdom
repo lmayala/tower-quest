@@ -1,5 +1,4 @@
 #!/bin/bash
-
 DBID=$(( `id -u` + 1000))
 
 # --- Check if Stage 4 is completed ---
@@ -12,18 +11,22 @@ if [ "$CURRENT_STAGE" -lt 4 ]; then
     exit 1
 fi
 
-# Check for docker-compose-stage5.yaml
-if [ ! -f docker-compose-stage5.yaml ]; then
-    echo "*****************************************************************************"
-    echo "** The 'docker-compose-stage5.yaml' file was not found. Please ensure it's **"
-    echo "** in the current directory when running 'check_galadriel_wisdom'.         **"
-    echo "*****************************************************************************"
+# Check that required containers are running
+GALADRIEL_CONTAINER_ID=$(docker ps -qf "name=galadriel")
+if [ -z "$GALADRIEL_CONTAINER_ID" ]; then
+    echo "Galadriel container not found"
+    exit 1
+fi
+
+LOTHLORIEN_CONTAINER_ID=$(docker ps -qf "name=lothlorien")
+if [ -z "$LOTHLORIEN_CONTAINER_ID" ]; then
+    echo "Lothlorien container not found"
     exit 1
 fi
 
 # Check 'galadriel' service logs for environment variable and secret content
 echo "Checking 'galadriel' service..."
-galadriel_logs=$(docker-compose -f docker-compose-stage5.yaml logs galadriel 2>&1)
+galadriel_logs=$(docker logs "$GALADRIEL_CONTAINER_ID" 2>&1)
 
 EXPECTED_MESSAGE="Even the smallest person can change the course of the future."
 EXPECTED_SECRET="The Mirror of Galadriel reveals many things."
@@ -47,7 +50,7 @@ echo "'galadriel' service environment variable and secret content validated."
 
 # Check 'lothlorien' service logs for secret access confirmation
 echo "Checking 'lothlorien' service..."
-lothlorien_logs=$(docker-compose -f docker-compose-stage5.yaml logs lothlorien 2>&1)
+lothlorien_logs=$(docker logs "$LOTHLORIEN_CONTAINER_ID" 2>&1)
 
 if ! echo "$lothlorien_logs" | grep -qE "Lothlórien service confirmed access to *galadriel_secret"; then
     echo "*********************************************************************************"

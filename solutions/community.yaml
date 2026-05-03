@@ -1,129 +1,135 @@
-version: "3.8"
-
 services:
 
+  elrond:
+    image: alpine
+    container_name: elrond
+    command: >
+      sh -c 'echo "Summons to the community"; 
+             rm -rf /shared/call_timestamp.txt; 
+             echo $$(date +%s) > /shared/call_timestamp.txt ;
+             tail -f /dev/null'
+    volumes:
+      - summons_volume:/shared
+
   gandalf:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: gandalf
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'I have come with wisdom!' &&
-             echo $$(cat /tmp/summons.txt) &&
-             sleep 3600"
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Gandalf: I have come with wisdom!' &&
+             echo $$(cat /shared/call_timestamp.txt) &&
+             tail -f /dev/null"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
 
   aragorn:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: aragorn
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'Ready for adventure!' &&
-             echo $$(cat /tmp/summons.txt) &&
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Aragorn: Ready for adventure!' &&
+             echo $$(cat /shared/call_timestamp.txt) &&
              sleep 3600"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
 
   legolas:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: legolas
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'I have arrived at the community!' &&
-             echo $$(cat /tmp/summons.txt) &&
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Legolas: I have arrived at the community!' &&
+             echo $$(cat /shared/call_timestamp.txt) &&
              sleep 3600"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
 
   gimli:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: gimli
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'Charge!' &&
-             echo `cat /tmp/summons.txt` &&
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Gimli: Charge!' &&
+             echo `cat /shared/call_timestamp.txt` &&
              sleep 3600"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
 
   boromir:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: boromir
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'For Gondor!' &&
-             echo $$(cat /tmp/summons.txt) &&
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Boromir: For Gondor!' &&
+             echo $$(cat /shared/call_timestamp.txt) &&
              sleep 3600"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
 
   frodo:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: frodo
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'I have accepted the mission.' &&
-             echo $$(cat /tmp/summons.txt) &&
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Frodo: I have accepted the mission.' &&
+             echo $$(cat /shared/call_timestamp.txt) &&
              sleep 3600"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
 
   sam:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: sam
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'Always by your side.' &&
-             echo $$(cat /tmp/summons.txt) &&
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Sam: Always by your side.' &&
+             echo $$(cat /shared/call_timestamp.txt) &&
              sleep 3600"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
 
   pippin:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: pippin
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'How exciting to join!' &&
-             echo $$(cat /tmp/summons.txt) &&
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Pippin: How exciting to join!' &&
+             echo $$(cat /shared/call_timestamp.txt) &&
              sleep 3600"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
 
   merry:
+    depends_on:
+      - elrond
     image: alpine:latest
     container_name: merry 
     command: >
-      sh -c "while [ ! -f /tmp/summons.txt ]; do sleep 1; done;
-             echo 'Ready for the journey!' &&
-             echo $$(cat /tmp/summons.txt) &&
+      sh -c "while [ ! -f /shared/call_timestamp.txt ]; do sleep 1; done;
+             echo 'Merry: Ready for the journey!' &&
+             echo $$(cat /shared/call_timestamp.txt) &&
              sleep 3600"
     volumes:
-      - summons_volume:/tmp
-    networks:
-      - rivendel_net
+      - summons_volume:/shared
+
 
 volumes:
   summons_volume:
-    name: summons_volume
-
-networks:
-  rivendel_net:
-    driver: bridge
+    external: true
 
