@@ -57,13 +57,14 @@ case $STAGE in
                 ;;
 	6) 
 		showlines $DATA/help_6.txt
+                echo ""
                 ;;
 	7) 
 		showlines $DATA/help_7.txt
+                echo ""
                 ;;
 	8) 
-		clear
-		showlines $DATA/isengard.ansi
+                echo ""
 		exit
                 ;;
 	*)

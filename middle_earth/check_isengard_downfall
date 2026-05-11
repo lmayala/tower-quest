@@ -42,5 +42,6 @@ echo "*****************************************************"
 echo "** Stage 7 (The Downfall of Isengard) completed! **"
 echo "*****************************************************"
 
+read -n 1 -r -s -p "Press any key to continue..." key
 welcome
 exit 0
