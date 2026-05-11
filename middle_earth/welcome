@@ -10,6 +10,20 @@ function keypause () {
 	read -n 1 -r -s -p "Press any key to continue..." key
 }
 
+pick_ansi() {
+  local hq="$1"
+  if [[ $LANG == *"UTF-8"* ]] || [[ $LC_ALL == *"UTF-8"* ]]; then
+    echo "$hq"
+  else
+    local low="${hq%.*}_low.ansi"
+    if [ -e "$low" ]; then
+      echo "$low"
+    else
+      echo "$hq"
+    fi
+  fi
+}
+
 if [ `tput cols` -lt 150 ]
 then
 	echo "************************************************"
@@ -22,7 +36,7 @@ fi
 clear
 if [ "$STAGE" == "1" ] 
 then
-   showlines $DATA/rivendell.ansi DELAY=0.04
+   showlines $(pick_ansi $DATA/rivendell.ansi) DELAY=0.04
    sleep 2
    toilet -ktf small --gay < $DATA/quote1.txt
    keypause
@@ -37,11 +51,14 @@ if [ "$STAGE" == "6" ]
 then
     showlines $DATA/story_6a.txt
     keypause
-    if [ -e $DATA/amon-hen.ansi ]
+    ansi_file=$(pick_ansi $DATA/amon-hen.ansi)
+    if [ -e "$ansi_file" ]
     then
-        showlines $DATA/amon-hen.ansi
+	clear
+        showlines "$ansi_file"
         keypause
     fi
+    clear
     showlines $DATA/story_6b.txt
     keypause
 fi
@@ -49,23 +66,47 @@ if [ "$STAGE" == "5" ]
 then
     showlines $DATA/story_5a.txt
     keypause
-    if [ -e $DATA/youshallnotpass.ansi ]
+    ansi_file=$(pick_ansi $DATA/youshallnotpass.ansi)
+    if [ -e "$ansi_file" ]
     then
-        showlines $DATA/youshallnotpass.ansi
+        clear
+        showlines "$ansi_file"
         keypause
     fi
+    clear
     showlines $DATA/story_5b.txt
     keypause
 fi
+if [ "$STAGE" == "4" ]
+then
+    clear
+    ansi_file=$(pick_ansi $DATA/durin.ansi)
+    if [ -e "$ansi_file" ]
+    then
+        clear
+        showlines "$ansi_file"
+        keypause
+    fi
+fi
+clear
 helpme
 keypause
-if [ "$STAGE" == "6" ]
+
+
+if [ "$STAGE" == "7" ]
 then
-    PROCESS=$(pgrep -u $USER sshd | head -1)
-    if [ "$PROCESS" != "" ]
-    then
-        kill -9 $(pgrep -u $USER sshd | head -1)
-    fi
-    kill -9 $PPID
+ clear
+ ansi_file=$(pick_ansi $DATA/isengarddam.ansi)
+ if [ -e "$ansi_file" ]
+ then
+  clear
+  showlines "$ansi_file"
+  keypause
+ fi
+ clear
+ echo ""
+ echo "The road ahead leads east, where another fate awaits."
+ echo "Until we meet again in the lands of The Return of the King..."
+ echo ""
+ exit 0
 fi
-echo ""

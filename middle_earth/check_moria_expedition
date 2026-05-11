@@ -39,42 +39,30 @@ if [ -z "$explorer_container_id" ]; then
 fi
 echo "'explorer' service is running."
 
-# Check for explorer-torchbearer communication (by checking explorer logs)
+# Polling: give explorer time to curl all 3 torchbearer replicas
+echo "Waiting for explorer to reach all torchbearer instances..."
+ALL_FOUND=false
+for i in $(seq 1 12); do
+    explorer_logs=$(docker logs "$explorer_container_id" 2>&1)
+    valid_identifiers=$(docker ps --filter "label=com.docker.compose.service=torchbearer" --format "{{.Names}} {{.ID}}" | tr ' ' '\n' | sort -u)
+    instances=$(echo "$explorer_logs" | sed -n 's/.*Torchbearer instance \+\([^ ]\+\).*/\1/p' | sort -u | grep -Fxf <(echo "$valid_identifiers") | wc -l)
+    if [ "$instances" -ge 3 ]; then
+        ALL_FOUND=true
+        break
+    fi
+    sleep 2
+done
+
+# Check for explorer-torchbearer communication
 echo "Checking explorer-torchbearer communication..."
-explorer_logs=$(docker logs "$explorer_container_id" 2>&1)
 
-# The explorer should be curling to http://torchbearer:8080, which should return the server's response.
-# The response from the python http.server is usually blank or a simple directory listing, which won't appear directly
-# in the `curl -s` output. Instead, we should look for evidence that `curl` ran successfully, which might be in the form of `Connection refused` NOT being present,
-# or just the presence of the `Torchbearer instance` string from the torchbearer's log (if explorer catches it directly or indirectly).
-# A better check is to see if explorer's logs contain output from the `curl` command without error messages.
-
-# Let's look for multiple successful HTTP responses, implying load balancing across different torchbearers.
-# The python http.server returns a 200 OK. The output to curl -s would be the HTML content, which is usually blank or a directory listing.
-# We can just look for the absence of connection errors and repeated curl attempts.
-
-# Get valid torchbearer names and short IDs
-valid_identifiers=$(docker ps --filter "label=com.docker.compose.service=torchbearer" --format "{{.Names}} {{.ID}}" | tr ' ' '\n' | sort -u)
-
-# Extract identifiers from explorer logs and verify they are valid torchbearers
-instances=$(echo "$explorer_logs" | sed -n 's/.*Torchbearer instance \+\([^ ]\+\).*/\1/p' | sort -u | grep -Fxf <(echo "$valid_identifiers") | wc -l)
-
-if [ "$instances" -ne 3 ]; then
+if [ "$ALL_FOUND" = false ]; then
     echo "**************************************************************************************"
     echo "** Explorer didn't log correctly the logs for torchbearer instances                 **"
     echo "**************************************************************************************"
-    echo "$instances instances found"
+    echo "$instances instances found after 24 seconds"
     exit 1
 fi
-
-# Also ensure different torchbearer hostnames appear in the explorer logs, indicating load balancing.
-# This is a bit more complex to parse from generic http.server logs. A simpler check for now
-# is to ensure the explorer is making *some* successful requests.
-
-# To verify load balancing, we would ideally check if explorer logs show responses from different torchbearer instances.
-# However, the current `python3 -m http.server` doesn't include hostname in its default output. 
-# For now, we will rely on checking for multiple successful HTTP responses as a proxy for load balancing, 
-# and implicitly assume Docker Compose handles the distribution.
 
 echo "Explorer-torchbearer communication validated."
 

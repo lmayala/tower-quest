@@ -1,7 +1,10 @@
 The Council of Elrond: Elrond's Call
 
-In the tranquil valley of Rivendell, Frodo awoke, slowly regaining his strength after his arduous journey. He soon learned that a crucial council was to be held, a gathering of the Free Peoples to decide the fate of the One Ring.
+In the tranquil valley of Rivendell, Frodo awoke, slowly regaining his strength after his arduous journey. He soon 
+learned that a crucial council was to be held, a gathering of the Free Peoples to decide the fate of the One Ring.
 
-But before the full council could convene, Elrond, the Lord of Rivendell, needed to send forth a summons. A call to all who would stand against the shadow, a beacon across Middle-earth to gather the wise and the brave. This initial call, though simple, was the foundation upon which the great Fellowship would be built.
+But before the full council could convene, Elrond, the Lord of Rivendell, needed to send forth a summons. A call to all 
+who would stand against the shadow, a beacon across Middle-earth to gather the wise and the brave. This initial call, 
+though simple, was the foundation upon which the great Fellowship would be built.
 
 It is your task to ensure Elrond's summons is properly sent, marking the beginning of this epic tale.

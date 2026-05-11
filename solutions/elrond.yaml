@@ -9,8 +9,6 @@ services:
              tail -f /dev/null'
     volumes:
       - summons_volume:/shared
-    networks:
-      - rivendel_net
 
 volumes:
   summons_volume:

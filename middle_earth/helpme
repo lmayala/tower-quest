@@ -56,9 +56,15 @@ case $STAGE in
                 echo ""
                 ;;
 	6) 
-		
-		echo "${BOLD}The Defense of Helm's Deep - Orchestrating Allied Forces ${NORMAL}"
 		showlines $DATA/help_6.txt
+                ;;
+	7) 
+		showlines $DATA/help_7.txt
+                ;;
+	8) 
+		clear
+		showlines $DATA/isengard.ansi
+		exit
                 ;;
 	*)
 		clear

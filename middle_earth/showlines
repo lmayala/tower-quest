@@ -17,7 +17,7 @@ while IFS= read -r CMD; do
     then
         eval "echo \"$CMD\""
     else
-        echo $CMD
+        echo "$CMD"
     fi
     sleep "$DELAY"
 done < "$FILE"

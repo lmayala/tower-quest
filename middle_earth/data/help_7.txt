@@ -1,0 +1,12 @@
+**********************************************************************************
+ Stage 7: The Downfall of Isengard
+**********************************************************************************
+
+Isengard has fallen. The Ents have broken the dam, drowned the plain, and silenced the forges. All that 
+remains of Saruman's works is still and water. Orthanc stands alone.
+
+To finish the game, run the final check script:
+
+ check_isengard_downfall
+
+This will dismantle all of Helm's Deep and release Middle-earth from its burdens.

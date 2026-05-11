@@ -1,25 +1,32 @@
-For this stage, the Fellowship arrives in Lothlórien, seeking the wisdom of Lady Galadriel. You will learn to manage sensitive information using environment variables and Docker Compose secrets.
+For this stage, the Fellowship arrives in Lothlórien, seeking the wisdom of Lady Galadriel. You will learn to manage 
+sensitive information using environment variables and Docker Compose secrets.
 
 Here are the requirements for your docker-compose.yaml file:
 
 - Introduce a new service named `galadriel`.
   - It should use the `alpine` image.
   - It must be connected to the `fellowship-network`.
-  - It should have an environment variable named `GALADRIEL_MESSAGE` with the value "Even the smallest person can change the course of the future."
-  - It should also use a Docker Compose secret named `galadriel_secret` containing a sensitive phrase, e.g., "The Mirror of Galadriel reveals many things."
-  - Its command should read `GALADRIEL_MESSAGE` from the environment and the content of the secret file, log both, and keep the container running with `tail -f /dev/null`.
+  - It should have an environment variable named `GALADRIEL_MESSAGE` with the value "Even the smallest person can 
+change the course of the future."
+  - It should also use a Docker Compose secret named `galadriel_secret` containing a sensitive phrase, e.g., "The 
+Mirror of Galadriel reveals many things."
+  - Its command should read `GALADRIEL_MESSAGE` from the environment and the content of the secret file, log both, and 
+keep the container running with `tail -f /dev/null`.
 
 - Introduce a new service named `lothlorien`.
   - It should use the `alpine` image.
   - It must be connected to the `fellowship-network`.
   - It should depend on the `galadriel` service.
-  - Its command should verify that `galadriel_secret` is mounted and readable within its container, and log a confirmation message. It should also keep the container running with `tail -f /dev/null`.
+  - Its command should verify that `galadriel_secret` is mounted and readable within its container, and log a 
+confirmation message. It should also keep the container running with `tail -f /dev/null`.
 
-Note: The `galadriel_secret` should be defined globally and then referenced by both `galadriel` and `lothlorien` services. This demonstrates sharing secrets securely.
+Note: The `galadriel_secret` should be defined globally and then referenced by both `galadriel` and `lothlorien` 
+services. This demonstrates sharing secrets securely.
 
 === HOW TO FINISH THE STAGE ===
 
 Update your docker-compose.yaml and run it in detached mode (e.g., `docker-compose up -d`).
-When all services are running, the `galadriel` service logs its message and secret, and `lothlorien` confirms secret access, call the command 'check_galadriel_wisdom'.
+When all services are running, the `galadriel` service logs its message and secret, and `lothlorien` confirms secret 
+access, call the command 'check_galadriel_wisdom'.
 
 Whenever you need to go back to these instructions, the command 'helpme' will show this same text.

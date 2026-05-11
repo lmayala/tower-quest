@@ -1,5 +1,10 @@
 The Journey Through Moria: Scaling and Load Balancing
 
-Venturing forth, the Fellowship faces the treacherous pass of Caradhras, but ultimately decides to seek passage through their ancient, subterranean realm: the Mines of Moria. This vast and perilous network of tunnels presents a daunting challenge. To navigate its depths and ensure no one is left behind or overwhelmed, the Fellowship must learn to manage their resources efficiently and coordinate their efforts.
+Venturing forth, the Fellowship faces the treacherous pass of Caradhras, but ultimately decides to seek passage through 
+their ancient, subterranean realm: the Mines of Moria. This vast and perilous network of tunnels presents a daunting 
+challenge. To navigate its depths and ensure no one is left behind or overwhelmed, the Fellowship must learn to manage 
+their resources efficiently and coordinate their efforts.
 
-In the darkness of Moria, scaling up communication and distributing tasks becomes critical for survival. Your mission is to help establish these systems, ensuring the Fellowship can journey through the mines, prepared for whatever might lie ahead.
+In the darkness of Moria, scaling up communication and distributing tasks becomes critical for survival. Your mission 
+is to help establish these systems, ensuring the Fellowship can journey through the mines, prepared for whatever might 
+lie ahead.

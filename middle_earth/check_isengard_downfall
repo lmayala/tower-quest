@@ -1,0 +1,46 @@
+#!/bin/bash
+
+DBID=$(( `id -u` + 1000))
+
+# --- Check if Stage 6 is completed ---
+CURRENT_STAGE=`sqlite3 /usr/local/lib/middle_earth/middle_earth.db "SELECT stage_completed FROM stages WHERE user_id = $DBID;"`
+if [ "$CURRENT_STAGE" -lt 6 ]; then
+ echo "*************************************************************************"
+ echo "** Stage 6 (The Defense of Helm's Deep) has not been completed yet. **"
+ echo "** Please complete Stage 6 before attempting to validate Stage 7. **"
+ echo "*************************************************************************"
+ exit 1
+fi
+
+# Bring down all compose projects before pruning
+echo "Dismantling the defenses of Helm's Deep..."
+
+# Try to down the stage 6 compose files if they exist in common locations
+for dir in /home/*; do
+ if [ -f "$dir/docker-compose-defense.yaml" ] && [ -f "$dir/docker-compose-outpost.yaml" ]; then
+  cd "$dir"
+  docker-compose -f docker-compose-defense.yaml -f docker-compose-outpost.yaml down -v 2>/dev/null
+ fi
+ if [ -f "$dir/docker-compose.yaml" ]; then
+  cd "$dir"
+  docker-compose down -v 2>/dev/null
+ fi
+done
+
+echo "The Ents break the dams — flooding Isengard..."
+docker system prune -a -f --volumes 2>/dev/null
+
+echo ""
+echo "Isengard is drowned. The furnaces are silent, the forges are cold."
+echo "Orthanc stands alone amid the water — Saruman's power is broken."
+echo ""
+
+# Update stage to 7
+sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; UPDATE stages SET stage_completed = 7 WHERE user_id = $DBID;"
+
+echo "*****************************************************"
+echo "** Stage 7 (The Downfall of Isengard) completed! **"
+echo "*****************************************************"
+
+welcome
+exit 0

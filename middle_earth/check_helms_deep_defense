@@ -73,12 +73,19 @@ if [ "$wall_guard_replicas" -lt 2 ]; then
 fi
 echo "'wall_guard' service scaled to $wall_guard_replicas replicas."
 
-# Check 'scout_captain'-'keep_commander' communication
+# Check 'scout_captain'-'keep_commander' communication with retries
 echo "Checking 'scout_captain'-'keep_commander' communication..."
-scout_captain_logs=$(docker-compose $COMPOSE_FILES logs scout_captain 2>&1)
 
-# Look for successful HTTP responses from keep_commander, indicating communication
-if ! echo "$scout_captain_logs" | grep -q "200 OK"; then
+for i in 1 2 3 4 5 6 7 8; do
+    scout_captain_logs=$(docker-compose $COMPOSE_FILES logs scout_captain 2>&1)
+    if echo "$scout_captain_logs" | grep -q "200 OK"; then
+        FOUND_200=1
+        break
+    fi
+    sleep 3
+done
+
+if [ -z "$FOUND_200" ]; then
     echo "*******************************************************************************************"
     echo "** 'scout_captain' did not log successful HTTP 200 OK responses from 'keep_commander'.    **"
     echo "** Ensure 'keep_commander's server is running and 'scout_captain' is correctly configured **"

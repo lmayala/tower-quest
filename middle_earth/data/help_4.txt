@@ -1,24 +1,30 @@
-For this stage, the Fellowship journeys through the perilous Mines of Moria. To navigate safely and efficiently, you need to scale up your 'torchbearer' services and distribute the workload.
+For this stage, the Fellowship journeys through the perilous Mines of Moria. To navigate safely and efficiently, you 
+need to scale up your 'torchbearer' services and distribute the workload.
 
 Here are the requirements for your docker-compose.yaml file:
 
 - Define a new service named `torchbearer`.
   - It should use the `alpine` image.
   - It must be connected to the `fellowship-network` (from Stage 3).
-  - It should run a simple HTTP server on port `8080`, log `Torchbearer instance $HOSTNAME is shining a light!`, and keep the container running.
+  - It should run a simple HTTP server on port `8080`, log `Torchbearer instance $HOSTNAME is shining a light!`, and 
+keep the container running.
   - Scale the `torchbearer` service to at least 3 replicas using the `deploy` configuration.
 
 - Introduce a new service named `explorer`.
   - It should use the `alpine` image.
   - It must be connected to the `fellowship-network`.
   - It should depend on the `torchbearer` service.
-  - Its command should install `curl`, then repeatedly (`while true`) send HTTP requests to `http://torchbearer:8080` every 2 seconds, logging the output. This will demonstrate basic load balancing across your scaled `torchbearer` instances.
+  - Its command should install `curl`, then repeatedly (`while true`) send HTTP requests to `http://torchbearer:8080` 
+every 2 seconds, logging the output. This will demonstrate basic load balancing across your scaled `torchbearer` 
+instances.
 
-Note: All other existing services (Elrond, Gandalf, etc.) should remain as they were in Stage 3, connected to `fellowship-network`.
+Note: All other existing services (Elrond, Gandalf, etc.) should remain as they were in Stage 3, connected to 
+`fellowship-network`.
 
 === HOW TO FINISH THE STAGE ===
 
 Update your docker-compose.yaml and run it in detached mode (e.g., `docker-compose up -d`).
-When all services are running, the `torchbearer` instances are scaled, and the `explorer` is successfully communicating with them, call the command 'check_moria_expedition'.
+When all services are running, the `torchbearer` instances are scaled, and the `explorer` is successfully communicating 
+with them, call the command 'check_moria_expedition'.
 
 Whenever you need to go back to these instructions, the command 'helpme' will show this same text.

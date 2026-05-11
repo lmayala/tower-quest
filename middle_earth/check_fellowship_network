@@ -70,20 +70,29 @@ fi
 
 # Check Gandalf-Scout communication
 
-echo "Checking Gandalf-Scout communication..."
-scout_logs=$(docker logs scout 2>&1)
-EXPECTED_GANDALF_RESPONSE="Gandalf received your message" 
-GANDALF_IP=$(docker inspect gandalf|grep IPAddress|awk '{print $2}'|tr -d '",')
-GANDALF_RESPONSE=$(wget -qO- http://${GANDALF_IP}:8080/)
-echo $scout_logs
+EXPECTED_GANDALF_RESPONSE="Gandalf received your message"
 
-if [[ "$EXPECTED_GANDALF_RESPONSE" != "$GANDALF_RESPONSE" ]]; then
+# Try live check via the network first with retries (gandalf may need time to start)
+LIVE_RESPONSE=""
+for i in 1 2 3 4 5 6 7 8; do
+    LIVE_RESPONSE=$(docker exec scout curl -sf http://gandalf:8080 2>/dev/null)
+    if [ "$LIVE_RESPONSE" = "$EXPECTED_GANDALF_RESPONSE" ]; then
+        break
+    fi
+    sleep 3
+done
+
+if [ "$LIVE_RESPONSE" != "$EXPECTED_GANDALF_RESPONSE" ]; then
+    echo "Scout curl output: $LIVE_RESPONSE"
     echo "*****************************************************************************************"
     echo "** Gandalf container is not responding properly or answer is not the expected one      **"
     echo "** Please ensure Gandalf's server is running correctly                                 **"
     echo "*****************************************************************************************"
     exit 1
 fi
+
+scout_logs=$(docker logs scout 2>&1)
+echo "$scout_logs"
 
 if ! echo "$scout_logs" | grep -q "$EXPECTED_GANDALF_RESPONSE"; then
     echo "*****************************************************************************************"

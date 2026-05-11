@@ -19,7 +19,21 @@ is_valid_name() {
 
 mkdir -p /tmp/middle_earth
 
-showlines /usr/local/bin/middle_earth/data/hobbiton.ansi
+pick_ansi() {
+  local hq="$1"
+  if [[ $LANG == *"UTF-8"* ]] || [[ $LC_ALL == *"UTF-8"* ]]; then
+    echo "$hq"
+  else
+    local low="${hq%.*}_low.ansi"
+    if [ -e "$low" ]; then
+      echo "$low"
+    else
+      echo "$hq"
+    fi
+  fi
+}
+
+showlines $(pick_ansi /usr/local/bin/middle_earth/data/hobbiton.ansi)
 read -n 1 -r -s -p "Press any key to continue..." key
 clear
 while true; do
