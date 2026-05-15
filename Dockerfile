@@ -60,7 +60,11 @@ COPY bashrc/common /etc/skel/.bashrc
 RUN echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config
 RUN ssh-keygen -A
 
+COPY bashrc/root /root/.bashrc
+
 RUN mkdir /usr/local/jed
 COPY --from=build-stage /usr/local/jed /usr/local/jed
+RUN echo "hobbiton ALL=(ALL) NOPASSWD: /bin/su" >> /etc/sudoers
+RUN chmod 4755 /bin/su
 
 CMD ["/usr/local/bin/startup.sh"]

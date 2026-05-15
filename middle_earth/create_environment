@@ -1,5 +1,0 @@
-#!/bin/bash
-
-SRC=/usr/local/bin/middle_earth
-DATA=$SRC/data
-

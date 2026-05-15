@@ -40,6 +40,7 @@ then
    sleep 2
    toilet -ktf small --gay < $DATA/quote1.txt
    keypause
+   clear
 fi
 
 if [ -e $DATA/story_${STAGE}.txt ]

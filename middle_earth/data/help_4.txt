@@ -6,8 +6,8 @@ Here are the requirements for your docker-compose.yaml file:
 - Define a new service named `torchbearer`.
   - It should use the `alpine` image.
   - It must be connected to the `fellowship-network` (from Stage 3).
-  - It should run a simple HTTP server on port `8080`, log `Torchbearer instance $HOSTNAME is shining a light!`, and 
-keep the container running.
+  - It should run a simple HTTP server on port `8080`, serving a response with the content `Torchbearer instance $HOSTNAME is shining a light!`, and 
+keep the service running.
   - Scale the `torchbearer` service to at least 3 replicas using the `deploy` configuration.
 
 - Introduce a new service named `explorer`.
@@ -15,7 +15,7 @@ keep the container running.
   - It must be connected to the `fellowship-network`.
   - It should depend on the `torchbearer` service.
   - Its command should install `curl`, then repeatedly (`while true`) send HTTP requests to `http://torchbearer:8080` 
-every 2 seconds, logging the output. This will demonstrate basic load balancing across your scaled `torchbearer` 
+every 2 seconds, logging the output in the format `Torchbearer instance <HOSTNAME>`. This will demonstrate basic load balancing across your scaled `torchbearer` 
 instances.
 
 Note: All other existing services (Elrond, Gandalf, etc.) should remain as they were in Stage 3, connected to 

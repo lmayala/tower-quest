@@ -12,12 +12,8 @@ if [ "$COLUMNS" -lt 150 ]; then
         echo "************************************************"
         exit 1
 fi
-images=("nazgul" "prancing_pony" "hide_hobbits")
-containers=("nazgul0" "nazgul1" "nazgul2" "nazgul3" "nazgul4" "nazgul6" "nazgul7" "nazgul5" "prancing_pony")
 services=("sshd" "process_users")
 bar_length=50
-total_images=${#images[@]}  
-total_containers=${#containers[@]} 
 total_services=${#services[@]}
 
 progress_bar() {
@@ -74,38 +70,6 @@ echo "All services are up and running"
 echo ""
 echo ""
 echo "-----------------------------------------------"
-echo ""
-echo "Detecting required images..."
-
-echo ""
-for ((i=0; i<$total_images; i++)); do
-  while ! docker images --format "{{.Repository}}" | grep -q "${images[$i]}"; do
-    sleep 1
-  done
-  progress=$(( ((i + 1) * 100) / total_images ))
-  progress_bar $progress
-done
-
-
-echo ""
-echo "All images have been detected"
-
-echo ""
-echo "-----------------------------------------------"
-echo ""
-echo "Checking containers are running"
-
-echo ""
-for ((i=0; i<$total_containers; i++)); do
-  while ! docker ps --format "{{.Names}}" | grep -q "${containers[$i]}"; do
-    sleep 1
-  done
-  progress=$(( ((i + 1) * 100) / total_containers ))
-  progress_bar $progress
-done
-echo ""
-echo "All containers are up and running"
-echo ""
 echo ""
 echo ""
 echo "Everything is ready for starting..."
