@@ -1,0 +1,16 @@
+{
+  "title": "Docker Compose Quest",
+  "description": "Learning docker compose",
+  "difficulty": "beginner",
+  "time": "5 minutes",
+  "details": {
+    "intro": {
+      "text": "intro.md",
+      "foreground": "foreground.sh",
+      "background": "background.sh"
+    }
+  },
+  "backend": {
+    "imageid": "ubuntu"
+  }
+}
