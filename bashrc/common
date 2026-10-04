@@ -119,3 +119,23 @@ if [ $? -eq 1 ]
 then
     exit
 fi
+
+trap '
+DBID=$(( `id -u` + 1000))
+name=$(whoami)
+CURRENT_STAGE=`sqlite3 /usr/local/lib/middle_earth/middle_earth.db "PRAGMA foreign_keys = ON; SELECT stage_completed + 1 FROM stages WHERE user_id = $DBID;"`
+if [ "$CURRENT_STAGE" -ge 8 ]; then 
+    echo "*****************************************************************"
+    echo "*  Farewell, $name! The tower has fallen. The tower falls.       *"
+    echo "*  The orcs are defeated. The tower stands empty.                *"
+    echo "**                                                              **"
+    echo "*  May the White Wizard guide your path.                          *"
+    echo "*****************************************************************"
+else
+    echo "*****************************************************************"
+    echo "*  To resume the game, reconnect with:                         *"
+    echo "*    docker exec -it -u $name tower-quest /bin/bash            *"
+    echo "*  You were at Stage $CURRENT_STAGE. Use \'helpme\' for instructions.  *"
+    echo "*****************************************************************"
+fi
+' EXIT
